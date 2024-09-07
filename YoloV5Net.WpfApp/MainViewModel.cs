@@ -1,10 +1,11 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
+using Yolov5Net.Scorer;
 
 namespace YoloV5Net.WpfApp;
-
 public class MainViewModel : INotifyPropertyChanged
 {
     private string _imagePath;
@@ -38,11 +39,15 @@ public class MainViewModel : INotifyPropertyChanged
             var outputPath = "result.jpg";
             FileInfo fi = new FileInfo(outputPath);
             Console.WriteLine(fi.FullName);
-            await _onnxService.RunInference(ImagePath, fi.FullName);
-            ResultImagePath = fi.FullName;
+            var r = await _onnxService.RunInference(ImagePath);
+            PredictResults.Clear();
+            foreach (var item in r)
+            {
+                PredictResults.Add(item);
+            }
         }
     }
-
+    public ObservableCollection<YoloYBResult> PredictResults { get; } = new ObservableCollection<YoloYBResult>();
     private bool CanExecuteProcessImage(object parameter)
     {
         return !string.IsNullOrEmpty(ImagePath) && File.Exists(ImagePath);

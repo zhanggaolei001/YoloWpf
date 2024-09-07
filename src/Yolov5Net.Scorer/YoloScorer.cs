@@ -15,8 +15,77 @@ using Yolov5Net.Scorer.Models.Abstract;
 using static System.Formats.Asn1.AsnWriter;
 
 namespace Yolov5Net.Scorer;
+public class YoloYBResult
+{
+    /*        new(0, "bxs"),//0
+        new(1, "red"),
+        new(2, "green"), 
+        new(3, "none"), //3 
+        new(4, "damaged"), */
+    static Dictionary<int,string> labelTextDic= new Dictionary<int, string>()
+    {{ 0, "bxs"},
+        { 1, "red" },
+       {2, "green" },
+       {3, "none" }, //3 
+       {4, "damaged" }
+    };
+    public YoloYBResult(Box box, float score, int label)
+    {
+        Rectangle = box;
+        Score = score;
+        Label = label;
+    }
+    public Box Rectangle { get; set; }
+    public double Score { get; set; }
+    public int Label { get; set; }
+    public string LabelText => labelTextDic[Label];
+}
+public class Box
+{
+    private float originalWidth;
+    private float originalHeight;
 
-/// <summary>
+    public Box(float[] arr, float originalWidth, float originalHeight)
+    {
+        // 确保原始尺寸不为零，避免除以零的错误
+        if (originalWidth == 0 || originalHeight == 0)
+        {
+            throw new ArgumentException("Original width and height must be greater than zero.");
+        }
+
+        // 计算缩放比例
+        float scaleWidth = originalWidth / 224;
+        float scaleHeight = originalHeight / 224;
+
+        // 应用缩放比例
+        // Left 和 Top 直接是左上角的坐标
+        Left = arr[0] * scaleWidth;
+        Top = arr[1] * scaleHeight;
+        // Width 和 Height 是通过右下角坐标减去左上角坐标计算得出
+        Width = (arr[2] - arr[0]) * scaleWidth;
+        Height = (arr[3] - arr[1]) * scaleHeight;
+
+        // 保存原始图像尺寸
+        this.originalWidth = originalWidth;
+        this.originalHeight = originalHeight;
+    }
+
+    public float Left { get; set; }
+    public float Top { get; set; }
+    public float Width { get; set; }
+    public float Height { get; set; }
+
+    // 可以添加方法来获取原始图像尺寸
+    public float GetOriginalWidth()
+    {
+        return originalWidth;
+    }
+
+    public float GetOriginalHeight()
+    {
+        return originalHeight;
+    }
+}/// <summary>
 /// Yolov5 scorer.
 /// </summary>
 public class YoloScorer<T> : IDisposable where T : YoloModel
@@ -81,6 +150,8 @@ public class YoloScorer<T> : IDisposable where T : YoloModel
     /// </summary>
     private List<YoloYBResult> Inference(Image<Rgba32> image)
     {
+        var w=image.Width;
+        var h=image.Height;
         if (image.Width != _model.Width || image.Height != _model.Height)
         {
             image.Mutate(x => x.Resize(_model.Width, _model.Height)); // fit image size to specified input size
@@ -99,7 +170,7 @@ public class YoloScorer<T> : IDisposable where T : YoloModel
         List<YoloYBResult> rs = new List<YoloYBResult>();
         for (int i = 0; i < num_dets; i++)
         {
-            var box = new Box(boxes.Skip(i * 4).Take(4).ToArray());
+            var box = new Box(boxes.Skip(i * 4).Take(4).ToArray(), w, h);
             var score = scores.Skip(i * 1).Take(1).ToArray()[0];
             var label = labels.Skip(i * 1).Take(1).ToArray()[0];
             rs.Add(new YoloYBResult(box, score, label));
@@ -108,32 +179,7 @@ public class YoloScorer<T> : IDisposable where T : YoloModel
         //  YoloYBResult[] outputs = new YoloYBResult[num_dets[0]];
        
     }
-    public class YoloYBResult
-    {
-        public YoloYBResult(Box box, float score, int label)
-        {
-            Rectangle = box;
-            Score = score;
-            Label = label;
-        }
-        public Box Rectangle { get; set; }
-        public double Score { get; set; }
-        public int Label { get; set; }
-    }
-    public class Box
-    {
-        public Box(float[] arr)
-        {
-            Left = arr[0];
-            Top = arr[1];
-            Right = arr[2];
-            Bottom = arr[3];
-        }
-        public float Left { get; set; }
-        public float Top { get; set; }
-        public float Right { get; set; }
-        public float Bottom { get; set; }
-    }
+ 
     /// <summary>
     /// Parses net output (detect) to predictions.
     /// </summary>

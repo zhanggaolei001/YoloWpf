@@ -7,7 +7,7 @@ public record YoloV5YB() : YoloModel(
     224,
     3,
 
-    10,
+    1,
 
     new[] { 8, 16, 32, 64 },
 
