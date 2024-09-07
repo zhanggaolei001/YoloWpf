@@ -31,20 +31,32 @@ public class MainViewModel : INotifyPropertyChanged
         _onnxService = new OnnxService("epoch_1000.onnx");
         ProcessImageCommand = new RelayCommand(ExecuteProcessImage, CanExecuteProcessImage);
     }
-
     private async void ExecuteProcessImage(object parameter)
     {
         if (!string.IsNullOrEmpty(ImagePath) && File.Exists(ImagePath))
         {
-            var outputPath = "result.jpg";
-            FileInfo fi = new FileInfo(outputPath);
-            Console.WriteLine(fi.FullName);
             var r = await _onnxService.RunInference(ImagePath);
             PredictResults.Clear();
             foreach (var item in r)
             {
                 PredictResults.Add(item);
             }
+            OriginalHeight = Box.ParentHeight;
+            OriginalWidth = Box.ParentWidth;
+            _currentHeight = Box.ParentHeight;
+            _currentWidth = Box.ParentWidth;
+         
+            double scale = 1;
+            if (CurrentHeight> 800)
+            {
+                CurrentHeight = 800;
+                scale = OriginalHeight / CurrentHeight;  
+                CurrentWidth = OriginalWidth / scale;
+            } 
+            windowHeight = CurrentHeight+50;
+            OnPropertyChanged(nameof(CurrentWidth)); 
+            OnPropertyChanged(nameof(WindowHeight));
+            OnPropertyChanged(nameof(CurrentHeight));
         }
     }
     public ObservableCollection<YoloYBResult> PredictResults { get; } = new ObservableCollection<YoloYBResult>();
@@ -69,4 +81,80 @@ public class MainViewModel : INotifyPropertyChanged
         OnPropertyChanged(propertyName);
         return true;
     }
+
+    protected bool SetProperty<T>(ref T field, T newValue, [CallerMemberName] string propertyName = null)
+    {
+        if (!Equals(field, newValue))
+        {
+            field = newValue;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            return true;
+        }
+
+        return false;
+    }
+
+    private double _currentWidth;
+
+    public double CurrentWidth
+    {
+        get => _currentWidth;
+        set
+        {
+            SetProperty(ref _currentWidth, value);
+            UpdateXW();
+        }
+    }
+
+    private void UpdateXW()
+    {
+        ScaleX = _currentWidth / OriginalWidth;
+        foreach (var item in PredictResults)
+        {
+            item.Rectangle.X = (float)(item.Rectangle.X * ScaleX);
+            item.Rectangle.Width = (float)(item.Rectangle.Width * ScaleX);
+        }
+    }
+    public double WindowHeight
+    {
+        get => windowHeight; set
+        {
+            windowHeight = value;
+            OnPropertyChanged();    
+        }
+    }
+
+    private double _currentHeight;
+
+    public double CurrentHeight
+    {
+        get => _currentHeight;
+        set
+        {
+            SetProperty(ref _currentHeight, value);
+            WindowHeight = value + 50;
+            UpdateHY();
+        }
+    }
+
+    private void UpdateHY()
+    {
+        ScaleY = _currentHeight / OriginalHeight;
+        foreach (var item in PredictResults)
+        {
+            item.Rectangle.Y = (float)(item.Rectangle.Y * ScaleY);
+            item.Rectangle.Height = (float)(item.Rectangle.Height * ScaleY);
+        }
+    }
+
+    private double scaleX;
+
+    public double ScaleX { get => scaleX; set => SetProperty(ref scaleX, value); }
+
+    private double scaleY;
+    private double windowHeight;
+
+    public double ScaleY { get => scaleY; set => SetProperty(ref scaleY, value); }
+    public double OriginalWidth { get; set; }
+    public double OriginalHeight { get; set; }
 }

@@ -6,8 +6,10 @@ using SixLabors.ImageSharp.Processing;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Yolov5Net.Scorer.Extensions;
@@ -22,9 +24,10 @@ public class YoloYBResult
         new(2, "green"), 
         new(3, "none"), //3 
         new(4, "damaged"), */
-    static Dictionary<int,string> labelTextDic= new Dictionary<int, string>()
-    {{ 0, "bxs"},
-        { 1, "red" },
+    static Dictionary<int, string> labelTextDic = new Dictionary<int, string>()
+    {
+       { 0, "bxs"},
+       { 1, "red" },
        {2, "green" },
        {3, "none" }, //3 
        {4, "damaged" }
@@ -40,13 +43,25 @@ public class YoloYBResult
     public int Label { get; set; }
     public string LabelText => labelTextDic[Label];
 }
-public class Box
+public class Box : INotifyPropertyChanged
 {
+    public event PropertyChangedEventHandler PropertyChanged;
+
+    protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
     private float originalWidth;
     private float originalHeight;
-
+    private float left;
+    private float top;
+    private float width;
+    private float height;
+    public static float ParentWidth { get; set; }
+    public static float ParentHeight { get; set; }
     public Box(float[] arr, float originalWidth, float originalHeight)
     {
+       
         // 确保原始尺寸不为零，避免除以零的错误
         if (originalWidth == 0 || originalHeight == 0)
         {
@@ -59,8 +74,8 @@ public class Box
 
         // 应用缩放比例
         // Left 和 Top 直接是左上角的坐标
-        Left = arr[0] * scaleWidth;
-        Top = arr[1] * scaleHeight;
+        X = arr[0] * scaleWidth;
+        Y = arr[1] * scaleHeight;
         // Width 和 Height 是通过右下角坐标减去左上角坐标计算得出
         Width = (arr[2] - arr[0]) * scaleWidth;
         Height = (arr[3] - arr[1]) * scaleHeight;
@@ -69,11 +84,18 @@ public class Box
         this.originalWidth = originalWidth;
         this.originalHeight = originalHeight;
     }
+    protected bool SetField<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
+    {
+        if (EqualityComparer<T>.Default.Equals(field, value)) return false;
+        field = value;
+        OnPropertyChanged(propertyName);
+        return true;
+    }
 
-    public float Left { get; set; }
-    public float Top { get; set; }
-    public float Width { get; set; }
-    public float Height { get; set; }
+    public float X { get => left; set => SetField(ref left, value); }
+    public float Y { get => top; set => SetField(ref top, value); }
+    public float Width { get => width; set => SetField(ref width, value); }
+    public float Height { get => height; set => SetField(ref height, value); }
 
     // 可以添加方法来获取原始图像尺寸
     public float GetOriginalWidth()
@@ -150,8 +172,10 @@ public class YoloScorer<T> : IDisposable where T : YoloModel
     /// </summary>
     private List<YoloYBResult> Inference(Image<Rgba32> image)
     {
-        var w=image.Width;
-        var h=image.Height;
+        var w = image.Width;
+        var h = image.Height;
+        Box.ParentHeight = h;
+        Box.ParentWidth = w;
         if (image.Width != _model.Width || image.Height != _model.Height)
         {
             image.Mutate(x => x.Resize(_model.Width, _model.Height)); // fit image size to specified input size
@@ -177,9 +201,9 @@ public class YoloScorer<T> : IDisposable where T : YoloModel
         }
         return rs;
         //  YoloYBResult[] outputs = new YoloYBResult[num_dets[0]];
-       
+
     }
- 
+
     /// <summary>
     /// Parses net output (detect) to predictions.
     /// </summary>

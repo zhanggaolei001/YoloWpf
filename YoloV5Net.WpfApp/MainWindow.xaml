@@ -4,47 +4,63 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:YoloV5Net.WpfApp"
-        mc:Ignorable="d"
+        mc:Ignorable="d" 
         xmlns:mod="clr-namespace:Yolov5Net.Scorer;assembly=Yolov5Net.Scorer"
-        Title="MainWindow" Height="450" Width="800"    AllowDrop="True" 
+        Title="灭火器AI检测"    
+        AllowDrop="True"   
+        MinHeight="100"
+        Height="{Binding WindowHeight,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+        Width="{Binding CurrentWidth,Mode=TwoWay}" MinWidth="300"
         Drop="DropArea_Drop">
     <Window.DataContext>
         <local:MainViewModel />
     </Window.DataContext>
-    <Viewbox Stretch="Uniform">
-        <Grid     >
-            <Image x:Name="InputImage" Source="{Binding ImagePath}" Stretch="None" />
-            <ItemsControl ItemsSource="{Binding PredictResults}">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <Canvas />
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <ItemsControl.ItemContainerStyle>
-                    <Style TargetType="ContentPresenter">
-                        <Setter Property="Canvas.Left" Value="{Binding Rectangle.Left}" />
-                        <Setter Property="Canvas.Top" Value="{Binding Rectangle.Top}" />
-                    </Style>
-                </ItemsControl.ItemContainerStyle>
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate DataType="{x:Type mod:YoloYBResult}">
-                        <Canvas  
-                              >
-                            <TextBlock Text="{Binding LabelText}" Canvas.Top="-15"></TextBlock>
-                            <Border BorderThickness="10" 
-                              Height="{Binding Rectangle.Height }" 
-                              Width="{Binding Rectangle.Width }"
-                              BorderBrush="Red">
-                            </Border>
-                        </Canvas>
-                    </DataTemplate>
+    <Grid  
+        Width="{Binding CurrentWidth}"
+        VerticalAlignment="Top"
+        HorizontalAlignment="Left"  >
+        <Image x:Name="image"  
+         Width="{Binding CurrentWidth}"
+         Height="{Binding CurrentHeight}"
+               Source="{Binding ImagePath}"
+               Stretch="Fill"
+         ></Image>
+        <ItemsControl ItemsSource="{Binding PredictResults}"
+                      Width="{Binding ElementName=image,Path=ActualWidth}"  
+                      Height="{Binding ElementName=image,Path=ActualHeight}"
+                   VerticalAlignment="Top"
+               HorizontalAlignment="Left">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <Canvas VerticalAlignment="Top"
+               HorizontalAlignment="Left">
+                    </Canvas>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemContainerStyle>
+                <Style TargetType="ContentPresenter">
+                    <Setter Property="Canvas.Left" Value="{Binding Rectangle.X}" />
+                    <Setter Property="Canvas.Top" Value="{Binding Rectangle.Y}" />
+                </Style>
+            </ItemsControl.ItemContainerStyle>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate DataType="{x:Type mod:YoloYBResult}">
+                    <Canvas>
+                        <TextBlock Text="{Binding LabelText}" 
+                                   FontSize="18" Foreground="Yellow"
+                                   Canvas.Top="-18"></TextBlock>
+                        <Border 
+                          BorderThickness="2" 
+                        Height="{Binding Rectangle.Height }" 
+                        Width="{Binding Rectangle.Width }"
+                        BorderBrush="Red">
+                        </Border>
+                    </Canvas>
+                </DataTemplate>
 
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-            <TextBlock
-                Text="Drag and drop an image here"
-                HorizontalAlignment="Center"
-                VerticalAlignment="Center" />
-        </Grid>
-    </Viewbox>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+    </Grid>
+
 </Window>

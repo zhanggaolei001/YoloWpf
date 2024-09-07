@@ -19,7 +19,7 @@ public class OnnxService
     {
         using var image = await Image.LoadAsync<Rgba32>(imagePath);
         {
-        
+            
             using var scorer = new YoloScorer<YoloV5YB>(_modelPath);
             {
                 var predictions = scorer.Predict(image); 
