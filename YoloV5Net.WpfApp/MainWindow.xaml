@@ -7,10 +7,11 @@
         mc:Ignorable="d" 
         xmlns:mod="clr-namespace:Yolov5Net.Scorer;assembly=Yolov5Net.Scorer"
         Title="灭火器AI检测"    
-        AllowDrop="True"   
-        MinHeight="100"
-        Height="{Binding WindowHeight,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
-        Width="{Binding CurrentWidth,Mode=TwoWay}" MinWidth="300"
+        AllowDrop="True"    
+        ResizeMode="NoResize"
+        Height="{Binding WindowHeight,Mode=TwoWay}"
+        Width="{Binding CurrentWidth,Mode=TwoWay}" 
+       
         Drop="DropArea_Drop">
     <Window.DataContext>
         <local:MainViewModel />

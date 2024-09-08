@@ -43,20 +43,23 @@ public class MainViewModel : INotifyPropertyChanged
             }
             OriginalHeight = Box.ParentHeight;
             OriginalWidth = Box.ParentWidth;
-            _currentHeight = Box.ParentHeight;
+            windowHeight = OriginalHeight + 30;
+            _currentHeight = Box.ParentHeight; 
             _currentWidth = Box.ParentWidth;
-         
             double scale = 1;
-            if (CurrentHeight> 800)
+            if (CurrentHeight > 800)
             {
-                CurrentHeight = 800;
-                scale = OriginalHeight / CurrentHeight;  
-                CurrentWidth = OriginalWidth / scale;
-            } 
-            windowHeight = CurrentHeight+50;
-            OnPropertyChanged(nameof(CurrentWidth)); 
+                windowHeight = 830;
+                _currentHeight = 800; 
+                scale = OriginalHeight / CurrentHeight;
+                _currentWidth = OriginalWidth / scale;
+            }     OnPropertyChanged(nameof(CurrentWidth));  
             OnPropertyChanged(nameof(WindowHeight));
-            OnPropertyChanged(nameof(CurrentHeight));
+          
+            OnPropertyChanged(nameof(CurrentWidth));   
+            UpdateXW();
+            OnPropertyChanged(nameof(CurrentHeight));     
+            UpdateHY();
         }
     }
     public ObservableCollection<YoloYBResult> PredictResults { get; } = new ObservableCollection<YoloYBResult>();
@@ -94,7 +97,7 @@ public class MainViewModel : INotifyPropertyChanged
         return false;
     }
 
-    private double _currentWidth;
+    private double _currentWidth = 1000;
 
     public double CurrentWidth
     {
@@ -102,7 +105,7 @@ public class MainViewModel : INotifyPropertyChanged
         set
         {
             SetProperty(ref _currentWidth, value);
-            UpdateXW();
+          
         }
     }
 
@@ -120,11 +123,11 @@ public class MainViewModel : INotifyPropertyChanged
         get => windowHeight; set
         {
             windowHeight = value;
-            OnPropertyChanged();    
+            OnPropertyChanged();
         }
     }
 
-    private double _currentHeight;
+    private double _currentHeight = 800;
 
     public double CurrentHeight
     {
@@ -132,8 +135,7 @@ public class MainViewModel : INotifyPropertyChanged
         set
         {
             SetProperty(ref _currentHeight, value);
-            WindowHeight = value + 50;
-            UpdateHY();
+
         }
     }
 
@@ -152,7 +154,7 @@ public class MainViewModel : INotifyPropertyChanged
     public double ScaleX { get => scaleX; set => SetProperty(ref scaleX, value); }
 
     private double scaleY;
-    private double windowHeight;
+    private double windowHeight = 500;
 
     public double ScaleY { get => scaleY; set => SetProperty(ref scaleY, value); }
     public double OriginalWidth { get; set; }
