@@ -4,45 +4,46 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using Yolov5Net.Scorer;
+using YoloV5Net.WpfApp.Service;
 
 namespace YoloV5Net.WpfApp;
 public class MainViewModel : INotifyPropertyChanged
+{ 
+    public TabItemViewModel TabItemlViewModel { get; set; } = new(new FireExtinguisherDetectService("epoch_1000.onnx"));
+    public TabItemViewModel TabItem2ViewModel { get; set; } = new(new TireDefectsService("tire.onnx"));
+
+    public string Tab1Icon { get; set; } = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "img1.jpg");
+    public string Tab2Icon { get; set; } = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "img2.jpg");
+    public string Tab3Icon { get; set; } = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "img3.jpg"); 
+
+    public event PropertyChangedEventHandler PropertyChanged;
+
+    protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    protected bool SetField<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
+    {
+        if (EqualityComparer<T>.Default.Equals(field, value)) return false;
+        field = value;
+        OnPropertyChanged(propertyName);
+        return true;
+    }
+}
+
+public class TabItemViewModel : INotifyPropertyChanged
 {
-    private string _imagePath;
-    public string ImagePath
+    public TabItemViewModel(IDefectService defectService)
     {
-        get { return _imagePath; }
-        set { SetField(ref _imagePath, value); }
+        _detectService = defectService;
+        DetectCommand = new RelayCommand(Detect, CanExecuteProcessImage);
     }
-
-    private string _resultImage;
-    public string ResultImagePath
-    {
-        get { return _resultImage; }
-        set { SetField(ref _resultImage, value); }
-    }
-
-    public ICommand ProcessImageCommand { get; }
-
-    private readonly OnnxService _onnxService;
-
-    public MainViewModel()
-    {
-        _onnxService = new OnnxService("epoch_1000.onnx");
-        ProcessImageCommand = new RelayCommand(ExecuteProcessImage, CanExecuteProcessImage);
-        Tab1Icon = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "img1.jpg");
-        Tab2Icon = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "img2.jpg");
-        Tab3Icon = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "img3.jpg");
-    }
-
-    public string Tab1Icon { get; set; }
-    public string Tab2Icon { get; set; }
-    public string Tab3Icon { get; set; }
-    private async void ExecuteProcessImage(object parameter)
+    private async void Detect()
     {
         if (!string.IsNullOrEmpty(ImagePath) && File.Exists(ImagePath))
         {
-            var r = await _onnxService.RunInference(ImagePath);
+            var r = await _detectService.Detect(ImagePath);
             PredictResults.Clear();
             foreach (var item in r)
             {
@@ -63,47 +64,35 @@ public class MainViewModel : INotifyPropertyChanged
             }
             OnPropertyChanged(nameof(CurrentWidth));
             OnPropertyChanged(nameof(WindowHeight));
-
             OnPropertyChanged(nameof(CurrentWidth));
             UpdateXW();
             OnPropertyChanged(nameof(CurrentHeight));
             UpdateHY();
         }
     }
-    public ObservableCollection<YoloYBResult> PredictResults { get; } = new ObservableCollection<YoloYBResult>();
-    private bool CanExecuteProcessImage(object parameter)
+    private bool CanExecuteProcessImage()
     {
         return !string.IsNullOrEmpty(ImagePath) && File.Exists(ImagePath);
     }
 
 
+    public ICommand DetectCommand { get; }
 
-    public event PropertyChangedEventHandler PropertyChanged;
 
-    protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+    private readonly IDefectService _detectService;
+
+
+    public string ImagePath
     {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
-
-    protected bool SetField<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
-    {
-        if (EqualityComparer<T>.Default.Equals(field, value)) return false;
-        field = value;
-        OnPropertyChanged(propertyName);
-        return true;
-    }
-
-    protected bool SetProperty<T>(ref T field, T newValue, [CallerMemberName] string propertyName = null)
-    {
-        if (!Equals(field, newValue))
+        get => _imagePath;
+        set
         {
-            field = newValue;
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-            return true;
+            _imagePath= value;
+            OnPropertyChanged(); 
         }
-
-        return false;
     }
+
+    public ObservableCollection<YoloYBResult> PredictResults { get; } = new ObservableCollection<YoloYBResult>();
 
     private double _currentWidth = 1000;
 
@@ -112,7 +101,7 @@ public class MainViewModel : INotifyPropertyChanged
         get => _currentWidth;
         set
         {
-            SetProperty(ref _currentWidth, value);
+            SetField(ref _currentWidth, value);
 
         }
     }
@@ -142,7 +131,7 @@ public class MainViewModel : INotifyPropertyChanged
         get => _currentHeight;
         set
         {
-            SetProperty(ref _currentHeight, value);
+            SetField(ref _currentHeight, value);
 
         }
     }
@@ -159,12 +148,28 @@ public class MainViewModel : INotifyPropertyChanged
 
     private double scaleX;
 
-    public double ScaleX { get => scaleX; set => SetProperty(ref scaleX, value); }
+    public double ScaleX { get => scaleX; set => SetField(ref scaleX, value); }
 
     private double scaleY;
     private double windowHeight = 500;
+    private string _imagePath;
 
-    public double ScaleY { get => scaleY; set => SetProperty(ref scaleY, value); }
+    public double ScaleY { get => scaleY; set => SetField(ref scaleY, value); }
     public double OriginalWidth { get; set; }
     public double OriginalHeight { get; set; }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    protected bool SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
+    {
+        if (EqualityComparer<T>.Default.Equals(field, value)) return false;
+        field = value;
+        OnPropertyChanged(propertyName);
+        return true;
+    }
 }

@@ -13,92 +13,93 @@
     <Window.DataContext>
         <local:MainViewModel />
     </Window.DataContext>
+    <Window.Resources>
+        <DataTemplate
+            DataType="{x:Type local:TabItemViewModel}">
+            <Grid 
+                AllowDrop="True"
+                Drop="FireExtinguisherDropArea_Drop"
+                Background="LightGray">
+                <Grid
+                    Margin="10"
+                    Height="{Binding CurrentHeight,Mode=TwoWay}"
+                    Width="{Binding CurrentWidth,Mode=TwoWay}"
+                    VerticalAlignment="Top"
+                    HorizontalAlignment="Left">
+                    <Image
+                        Width="{Binding CurrentWidth}"
+                        Height="{Binding CurrentHeight}"
+                        Source="{Binding ImagePath}"
+                        Stretch="Fill"></Image>
+                    <ItemsControl
+                        ItemsSource="{Binding PredictResults}"
+                        Width="{Binding CurrentWidth}"
+                        Height="{Binding CurrentHeight}"
+                        VerticalAlignment="Top"
+                        HorizontalAlignment="Left">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <Canvas
+                                    VerticalAlignment="Top"
+                                    HorizontalAlignment="Left">
+                                </Canvas>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemContainerStyle>
+                            <Style
+                                TargetType="ContentPresenter">
+                                <Setter
+                                    Property="Canvas.Left"
+                                    Value="{Binding Rectangle.X}" />
+                                <Setter
+                                    Property="Canvas.Top"
+                                    Value="{Binding Rectangle.Y}" />
+                            </Style>
+                        </ItemsControl.ItemContainerStyle>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate
+                                DataType="{x:Type mod:YoloYBResult}">
+                                <Canvas>
+                                    <TextBlock
+                                        Text="{Binding LabelText}"
+                                        FontSize="18"
+                                        Foreground="Red"
+                                        Canvas.Top="-18"></TextBlock>
+                                    <Border
+                                        BorderThickness="2"
+                                        Height="{Binding Rectangle.Height }"
+                                        Width="{Binding Rectangle.Width }"
+                                        BorderBrush="Red">
+                                    </Border>
+                                </Canvas>
+                            </DataTemplate>
+
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                </Grid>
+            </Grid>
+        </DataTemplate>
+    </Window.Resources>
     <TabControl
         TabStripPlacement="Left">
-        <TabItem>
+        <TabItem Content="{Binding TabItemlViewModel}">
             <TabItem.Header>
                 <Image
                     Source="{Binding Tab1Icon}"
                     Width="40"
                     Height="40"></Image>
-            </TabItem.Header>
-            <TabItem.Content>
-                <Grid
-                    AllowDrop="True"
-                    Drop="DropArea_Drop"
-                    Background="LightGray">
-                    <Grid
-                        Margin="10"
-                        Height="{Binding CurrentHeight,Mode=TwoWay}"
-                        Width="{Binding CurrentWidth,Mode=TwoWay}"
-                        VerticalAlignment="Top"
-                        HorizontalAlignment="Left">
-                        <Image
-                            x:Name="image"
-                            Width="{Binding CurrentWidth}"
-                            Height="{Binding CurrentHeight}"
-                            Source="{Binding ImagePath}"
-                            Stretch="Fill"></Image>
-                        <ItemsControl
-                            ItemsSource="{Binding PredictResults}"
-                            Width="{Binding ElementName=image,Path=ActualWidth}"
-                            Height="{Binding ElementName=image,Path=ActualHeight}"
-                            VerticalAlignment="Top"
-                            HorizontalAlignment="Left">
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <Canvas
-                                        VerticalAlignment="Top"
-                                        HorizontalAlignment="Left">
-                                    </Canvas>
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                            <ItemsControl.ItemContainerStyle>
-                                <Style
-                                    TargetType="ContentPresenter">
-                                    <Setter
-                                        Property="Canvas.Left"
-                                        Value="{Binding Rectangle.X}" />
-                                    <Setter
-                                        Property="Canvas.Top"
-                                        Value="{Binding Rectangle.Y}" />
-                                </Style>
-                            </ItemsControl.ItemContainerStyle>
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate
-                                    DataType="{x:Type mod:YoloYBResult}">
-                                    <Canvas>
-                                        <TextBlock
-                                            Text="{Binding LabelText}"
-                                            FontSize="18"
-                                            Foreground="Red"
-                                            Canvas.Top="-18"></TextBlock>
-                                        <Border
-                                            BorderThickness="2"
-                                            Height="{Binding Rectangle.Height }"
-                                            Width="{Binding Rectangle.Width }"
-                                            BorderBrush="Red">
-                                        </Border>
-                                    </Canvas>
-                                </DataTemplate>
-
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-
-                    </Grid>
-                </Grid>
-            </TabItem.Content>
+            </TabItem.Header> 
         </TabItem>
-        <TabItem>
+        <TabItem
+            Content="{Binding TabItem2ViewModel}">
             <TabItem.Header>
                 <Image
                     Source="{Binding Tab2Icon}"
                     Width="40"
                     Height="40"></Image>
             </TabItem.Header>
-            <TabItem.Content>
-                <TextBox>敬请期待......</TextBox>
-            </TabItem.Content>
+            
         </TabItem>
         <TabItem>
             <TabItem.Header>
