@@ -7,7 +7,7 @@
     xmlns:local="clr-namespace:YoloV5Net.WpfApp"
     mc:Ignorable="d"
     xmlns:mod="clr-namespace:Yolov5Net.Scorer;assembly=Yolov5Net.Scorer"
-    Title="灭火器AR+AI检测"
+    Title="AR+AI检测"
     Height="768"
     Width="1024">
     <Window.DataContext>
@@ -87,8 +87,8 @@
             <TabItem.Header>
                 <Image
                     Source="{Binding Tab1Icon}"
-                    Width="80"
-                    Height="80"></Image>
+                    Width="120"
+                    Height="120"></Image>
             </TabItem.Header> 
         </TabItem>
         <TabItem
@@ -96,8 +96,8 @@
             <TabItem.Header>
                 <Image
                     Source="{Binding Tab2Icon}"
-                    Width="80"
-                    Height="80"></Image>
+                    Width="120"
+                    Height="120"></Image>
             </TabItem.Header>
             
         </TabItem>
@@ -105,8 +105,8 @@
             <TabItem.Header>
                 <Image
                     Source="{Binding Tab3Icon}"
-                    Width="80"
-                    Height="80"></Image>
+                    Width="120"
+                    Height="120"></Image>
             </TabItem.Header>
             <TabItem.Content>
                 <TextBox>敬请期待......</TextBox>
