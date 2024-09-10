@@ -30,7 +30,14 @@ public class MainViewModel : INotifyPropertyChanged
     {
         _onnxService = new OnnxService("epoch_1000.onnx");
         ProcessImageCommand = new RelayCommand(ExecuteProcessImage, CanExecuteProcessImage);
+        Tab1Icon = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "img1.jpg");
+        Tab2Icon = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "img2.jpg");
+        Tab3Icon = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "img3.jpg");
     }
+
+    public string Tab1Icon { get; set; }
+    public string Tab2Icon { get; set; }
+    public string Tab3Icon { get; set; }
     private async void ExecuteProcessImage(object parameter)
     {
         if (!string.IsNullOrEmpty(ImagePath) && File.Exists(ImagePath))
@@ -44,21 +51,22 @@ public class MainViewModel : INotifyPropertyChanged
             OriginalHeight = Box.ParentHeight;
             OriginalWidth = Box.ParentWidth;
             windowHeight = OriginalHeight + 30;
-            _currentHeight = Box.ParentHeight; 
+            _currentHeight = Box.ParentHeight;
             _currentWidth = Box.ParentWidth;
             double scale = 1;
             if (CurrentHeight > 800)
             {
                 windowHeight = 830;
-                _currentHeight = 800; 
+                _currentHeight = 800;
                 scale = OriginalHeight / CurrentHeight;
                 _currentWidth = OriginalWidth / scale;
-            }     OnPropertyChanged(nameof(CurrentWidth));  
+            }
+            OnPropertyChanged(nameof(CurrentWidth));
             OnPropertyChanged(nameof(WindowHeight));
-          
-            OnPropertyChanged(nameof(CurrentWidth));   
+
+            OnPropertyChanged(nameof(CurrentWidth));
             UpdateXW();
-            OnPropertyChanged(nameof(CurrentHeight));     
+            OnPropertyChanged(nameof(CurrentHeight));
             UpdateHY();
         }
     }
@@ -105,7 +113,7 @@ public class MainViewModel : INotifyPropertyChanged
         set
         {
             SetProperty(ref _currentWidth, value);
-          
+
         }
     }
 

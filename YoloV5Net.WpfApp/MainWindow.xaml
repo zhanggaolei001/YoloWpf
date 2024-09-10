@@ -1,67 +1,118 @@
-﻿<Window x:Class="YoloV5Net.WpfApp.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:YoloV5Net.WpfApp"
-        mc:Ignorable="d" 
-        xmlns:mod="clr-namespace:Yolov5Net.Scorer;assembly=Yolov5Net.Scorer"
-        Title="灭火器AI检测"    
-        AllowDrop="True"    
-        ResizeMode="NoResize"
-        Height="{Binding WindowHeight,Mode=TwoWay}"
-        Width="{Binding CurrentWidth,Mode=TwoWay}" 
-       
-        Drop="DropArea_Drop">
+﻿<Window
+    x:Class="YoloV5Net.WpfApp.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:local="clr-namespace:YoloV5Net.WpfApp"
+    mc:Ignorable="d"
+    xmlns:mod="clr-namespace:Yolov5Net.Scorer;assembly=Yolov5Net.Scorer"
+    Title="灭火器AI检测"
+    Height="768"
+    Width="1024">
     <Window.DataContext>
         <local:MainViewModel />
     </Window.DataContext>
-    <Grid  
-        Width="{Binding CurrentWidth}"
-        VerticalAlignment="Top"
-        HorizontalAlignment="Left"  >
-        <Image x:Name="image"  
-         Width="{Binding CurrentWidth}"
-         Height="{Binding CurrentHeight}"
-               Source="{Binding ImagePath}"
-               Stretch="Fill"
-         ></Image>
-        <ItemsControl ItemsSource="{Binding PredictResults}"
-                      Width="{Binding ElementName=image,Path=ActualWidth}"  
-                      Height="{Binding ElementName=image,Path=ActualHeight}"
-                   VerticalAlignment="Top"
-               HorizontalAlignment="Left">
-            <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <Canvas VerticalAlignment="Top"
-               HorizontalAlignment="Left">
-                    </Canvas>
-                </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
-            <ItemsControl.ItemContainerStyle>
-                <Style TargetType="ContentPresenter">
-                    <Setter Property="Canvas.Left" Value="{Binding Rectangle.X}" />
-                    <Setter Property="Canvas.Top" Value="{Binding Rectangle.Y}" />
-                </Style>
-            </ItemsControl.ItemContainerStyle>
-            <ItemsControl.ItemTemplate>
-                <DataTemplate DataType="{x:Type mod:YoloYBResult}">
-                    <Canvas>
-                        <TextBlock Text="{Binding LabelText}" 
-                                   FontSize="18" Foreground="Yellow"
-                                   Canvas.Top="-18"></TextBlock>
-                        <Border 
-                          BorderThickness="2" 
-                        Height="{Binding Rectangle.Height }" 
-                        Width="{Binding Rectangle.Width }"
-                        BorderBrush="Red">
-                        </Border>
-                    </Canvas>
-                </DataTemplate>
+    <TabControl
+        TabStripPlacement="Left">
+        <TabItem>
+            <TabItem.Header>
+                <Image
+                    Source="{Binding Tab1Icon}"
+                    Width="40"
+                    Height="40"></Image>
+            </TabItem.Header>
+            <TabItem.Content>
+                <Grid
+                    AllowDrop="True"
+                    Drop="DropArea_Drop"
+                    Background="LightGray">
+                    <Grid
+                        Margin="10"
+                        Height="{Binding CurrentHeight,Mode=TwoWay}"
+                        Width="{Binding CurrentWidth,Mode=TwoWay}"
+                        VerticalAlignment="Top"
+                        HorizontalAlignment="Left">
+                        <Image
+                            x:Name="image"
+                            Width="{Binding CurrentWidth}"
+                            Height="{Binding CurrentHeight}"
+                            Source="{Binding ImagePath}"
+                            Stretch="Fill"></Image>
+                        <ItemsControl
+                            ItemsSource="{Binding PredictResults}"
+                            Width="{Binding ElementName=image,Path=ActualWidth}"
+                            Height="{Binding ElementName=image,Path=ActualHeight}"
+                            VerticalAlignment="Top"
+                            HorizontalAlignment="Left">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <Canvas
+                                        VerticalAlignment="Top"
+                                        HorizontalAlignment="Left">
+                                    </Canvas>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemContainerStyle>
+                                <Style
+                                    TargetType="ContentPresenter">
+                                    <Setter
+                                        Property="Canvas.Left"
+                                        Value="{Binding Rectangle.X}" />
+                                    <Setter
+                                        Property="Canvas.Top"
+                                        Value="{Binding Rectangle.Y}" />
+                                </Style>
+                            </ItemsControl.ItemContainerStyle>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate
+                                    DataType="{x:Type mod:YoloYBResult}">
+                                    <Canvas>
+                                        <TextBlock
+                                            Text="{Binding LabelText}"
+                                            FontSize="18"
+                                            Foreground="Red"
+                                            Canvas.Top="-18"></TextBlock>
+                                        <Border
+                                            BorderThickness="2"
+                                            Height="{Binding Rectangle.Height }"
+                                            Width="{Binding Rectangle.Width }"
+                                            BorderBrush="Red">
+                                        </Border>
+                                    </Canvas>
+                                </DataTemplate>
 
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
 
-    </Grid>
+                    </Grid>
+                </Grid>
+            </TabItem.Content>
+        </TabItem>
+        <TabItem>
+            <TabItem.Header>
+                <Image
+                    Source="{Binding Tab2Icon}"
+                    Width="40"
+                    Height="40"></Image>
+            </TabItem.Header>
+            <TabItem.Content>
+                <TextBox>敬请期待......</TextBox>
+            </TabItem.Content>
+        </TabItem>
+        <TabItem>
+            <TabItem.Header>
+                <Image
+                    Source="{Binding Tab3Icon}"
+                    Width="40"
+                    Height="40"></Image>
+            </TabItem.Header>
+            <TabItem.Content>
+                <TextBox>敬请期待......</TextBox>
+            </TabItem.Content>
+        </TabItem>
+
+    </TabControl>
+
 
 </Window>
