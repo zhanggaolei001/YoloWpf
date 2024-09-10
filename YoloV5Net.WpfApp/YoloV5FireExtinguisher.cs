@@ -1,8 +1,8 @@
 ﻿using Yolov5Net.Scorer.Models.Abstract;
 
 namespace YoloV5Net.WpfApp;
-
-public record YoloV5YB() : YoloModel(
+//fire extinguasher
+public record YoloV5FireExtinguisher() : YoloModel(
     224,
     224,
     3,
