@@ -20,7 +20,7 @@ namespace YoloV5Net.WpfApp
                 string filePath = files[0];
                 var viewModel = DataContext as MainViewModel;
                 viewModel.TabItemlViewModel.ImagePath = filePath;
-                viewModel.TabItemlViewModel.DetectCommand.Execute(filePath); 
+                viewModel.TabItemlViewModel.Detect(); 
             }
         }
     }

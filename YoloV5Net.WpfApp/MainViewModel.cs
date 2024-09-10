@@ -36,10 +36,9 @@ public class TabItemViewModel : INotifyPropertyChanged
 {
     public TabItemViewModel(IDefectService defectService)
     {
-        _detectService = defectService;
-        DetectCommand = new RelayCommand(Detect, CanExecuteProcessImage);
+        _detectService = defectService; 
     }
-    private async void Detect()
+   public  async void Detect()
     {
         if (!string.IsNullOrEmpty(ImagePath) && File.Exists(ImagePath))
         {
