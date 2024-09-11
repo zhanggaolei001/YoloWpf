@@ -8,13 +8,13 @@ using YoloV5Net.WpfApp.Service;
 
 namespace YoloV5Net.WpfApp;
 public class MainViewModel : INotifyPropertyChanged
-{ 
+{
     public TabItemViewModel TabItemlViewModel { get; set; } = new(new FireExtinguisherDetectService("epoch_1000.onnx"));
     public TabItemViewModel TabItem2ViewModel { get; set; } = new(new TireDefectsService("tire.onnx"));
 
     public string Tab1Icon { get; set; } = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "img1.jpg");
     public string Tab2Icon { get; set; } = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "img2.jpg");
-    public string Tab3Icon { get; set; } = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "img3.jpg"); 
+    public string Tab3Icon { get; set; } = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "img3.jpg");
 
     public event PropertyChangedEventHandler PropertyChanged;
 
@@ -36,9 +36,11 @@ public class TabItemViewModel : INotifyPropertyChanged
 {
     public TabItemViewModel(IDefectService defectService)
     {
-        _detectService = defectService; 
+        _detectService = defectService;
     }
-   public  async void Detect()
+
+    public ICommand DetectCommand => new RelayCommand(default, CanExecuteProcessImage);
+    public async void Detect()
     {
         if (!string.IsNullOrEmpty(ImagePath) && File.Exists(ImagePath))
         {
@@ -75,7 +77,6 @@ public class TabItemViewModel : INotifyPropertyChanged
     }
 
 
-    public ICommand DetectCommand { get; }
 
 
     private readonly IDefectService _detectService;
@@ -86,8 +87,8 @@ public class TabItemViewModel : INotifyPropertyChanged
         get => _imagePath;
         set
         {
-            _imagePath= value;
-            OnPropertyChanged(); 
+            _imagePath = value;
+            OnPropertyChanged();
         }
     }
 
