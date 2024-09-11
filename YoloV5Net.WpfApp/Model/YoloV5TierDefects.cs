@@ -3,8 +3,8 @@
 namespace YoloV5Net.WpfApp.Model;
 
 public record YoloV5TierDefects() : YoloModel(
-    224,
-    224,
+    640,
+    640,
     3,
 
     1,

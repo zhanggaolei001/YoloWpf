@@ -49,7 +49,7 @@ public class Box : INotifyPropertyChanged
     private float height;
     public static float ParentWidth { get; set; }
     public static float ParentHeight { get; set; }
-    public Box(float[] arr, float originalWidth, float originalHeight)
+    public Box(float[] arr, float originalWidth, float originalHeight,float modelWidth,float modelHeight)
     {
 
         // 确保原始尺寸不为零，避免除以零的错误
@@ -59,8 +59,8 @@ public class Box : INotifyPropertyChanged
         }
 
         // 计算缩放比例
-        float scaleWidth = originalWidth / 224;
-        float scaleHeight = originalHeight / 224;
+        float scaleWidth = originalWidth / modelWidth;
+        float scaleHeight = originalHeight / modelHeight;
 
         // 应用缩放比例
         // Left 和 Top 直接是左上角的坐标
@@ -166,6 +166,8 @@ public class YoloScorer<T> : IDisposable where T : YoloModel
         var h = image.Height;
         Box.ParentHeight = h;
         Box.ParentWidth = w;
+        var modelWidth = _model.Width;
+        var modelHeight = _model.Height;
         if (image.Width != _model.Width || image.Height != _model.Height)
         {
             image.Mutate(x => x.Resize(_model.Width, _model.Height)); // fit image size to specified input size
@@ -184,7 +186,7 @@ public class YoloScorer<T> : IDisposable where T : YoloModel
         List<YoloYbResult> rs = new List<YoloYbResult>();
         for (int i = 0; i < num_dets; i++)
         {
-            var box = new Box(boxes.Skip(i * 4).Take(4).ToArray(), w, h);
+            var box = new Box(boxes.Skip(i * 4).Take(4).ToArray(), w, h,modelWidth,modelHeight);
             var score = scores.Skip(i * 1).Take(1).ToArray()[0];
             var label = labels.Skip(i * 1).Take(1).ToArray()[0];
             rs.Add(new YoloYbResult(box, score, label,label.ToString()));
