@@ -9,8 +9,27 @@ using YoloV5Net.WpfApp.Service;
 namespace YoloV5Net.WpfApp;
 public class MainViewModel : INotifyPropertyChanged
 {
-    public TabItemViewModel TabItemlViewModel { get; set; } = new(new FireExtinguisherDetectService("epoch_1000.onnx"));
-    public TabItemViewModel TabItem2ViewModel { get; set; } = new(new TireDefectsService("tire.onnx"));
+  Dictionary<int,string> fire=  new Dictionary<int, string>()
+    {
+       {0, "bxs"},
+       {1, "red" },
+       {2, "green" },
+       {3, "none" }, //3 
+       {4, "damaged" }
+    };
+    Dictionary<int, string> tire = new Dictionary<int, string>()
+    {
+       {0, "a1"},
+       {1, "o1" },
+       {2, "c1" }
+    };
+    public MainViewModel()
+    {
+        TabItemlViewModel  = new(new FireExtinguisherDetectService("epoch_1000.onnx"),fire);
+        TabItem2ViewModel  = new(new TireDefectsService("tire.onnx"),tire);
+    }
+    public TabItemViewModel TabItemlViewModel { get; set; }
+    public TabItemViewModel TabItem2ViewModel { get; set; } 
 
     public string Tab1Icon { get; set; } = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "img1.jpg");
     public string Tab2Icon { get; set; } = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "img2.jpg");
@@ -34,11 +53,13 @@ public class MainViewModel : INotifyPropertyChanged
 
 public class TabItemViewModel : INotifyPropertyChanged
 {
-    public TabItemViewModel(IDefectService defectService)
+    public TabItemViewModel(IDefectService defectService, Dictionary<int, string>  labelDic)
     {
         _detectService = defectService;
+        LabelTextDic= labelDic;
     }
-
+ 
+    public   Dictionary<int, string> LabelTextDic { get; set; }
     public ICommand DetectCommand => new RelayCommand(default, CanExecuteProcessImage);
     public async void Detect()
     {
@@ -48,6 +69,7 @@ public class TabItemViewModel : INotifyPropertyChanged
             PredictResults.Clear();
             foreach (var item in r)
             {
+                item.LabelText = LabelTextDic[item.Label];  
                 PredictResults.Add(item);
             }
             OriginalHeight = Box.ParentHeight;
@@ -92,7 +114,7 @@ public class TabItemViewModel : INotifyPropertyChanged
         }
     }
 
-    public ObservableCollection<YoloYBResult> PredictResults { get; } = new ObservableCollection<YoloYBResult>();
+    public ObservableCollection<YoloYbResult> PredictResults { get; } = new ObservableCollection<YoloYbResult>();
 
     private double _currentWidth = 1000;
 

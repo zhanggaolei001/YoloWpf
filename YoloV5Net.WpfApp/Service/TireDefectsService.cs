@@ -8,7 +8,7 @@ namespace YoloV5Net.WpfApp.Service;
 
 public interface IDefectService
 {
-    Task<List<YoloYBResult>> Detect(string imagePath);
+    Task<List<YoloYbResult>> Detect(string imagePath);
 }
 public class DefectsService<T>: IDefectService where T : YoloModel
 {
@@ -18,13 +18,14 @@ public class DefectsService<T>: IDefectService where T : YoloModel
     {
         _modelPath = modelPath;
     }
-    public async Task<List<YoloYBResult>> Detect(string imagePath)
+    public async Task<List<YoloYbResult>> Detect(string imagePath)
     {
         using var image = await Image.LoadAsync<Rgba32>(imagePath);
         {
             using var scorer = new YoloScorer<T>(_modelPath);
             {
                 var predictions = scorer.Predict(image);
+                
                 return predictions;
             }
         }

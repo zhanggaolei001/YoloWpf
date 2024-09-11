@@ -17,31 +17,21 @@ using Yolov5Net.Scorer.Models.Abstract;
 using static System.Formats.Asn1.AsnWriter;
 
 namespace Yolov5Net.Scorer;
-public class YoloYBResult
+ 
+public class YoloYbResult
 {
-    /*        new(0, "bxs"),//0
-        new(1, "red"),
-        new(2, "green"), 
-        new(3, "none"), //3 
-        new(4, "damaged"), */
-    static Dictionary<int, string> labelTextDic = new Dictionary<int, string>()
-    {
-       { 0, "bxs"},
-       { 1, "red" },
-       {2, "green" },
-       {3, "none" }, //3 
-       {4, "damaged" }
-    };
-    public YoloYBResult(Box box, float score, int label)
+
+    public YoloYbResult(Box box, float score, int label, string labelText)
     {
         Rectangle = box;
         Score = score;
         Label = label;
+        LabelText = labelText;
     }
     public Box Rectangle { get; set; }
     public double Score { get; set; }
-    public int Label { get; set; }
-    public string LabelText => labelTextDic[Label];
+    public int Label { get; set; } 
+    public string LabelText { get; set; } 
 }
 public class Box : INotifyPropertyChanged
 {
@@ -61,7 +51,7 @@ public class Box : INotifyPropertyChanged
     public static float ParentHeight { get; set; }
     public Box(float[] arr, float originalWidth, float originalHeight)
     {
-       
+
         // 确保原始尺寸不为零，避免除以零的错误
         if (originalWidth == 0 || originalHeight == 0)
         {
@@ -170,7 +160,7 @@ public class YoloScorer<T> : IDisposable where T : YoloModel
     /// <summary>
     /// Runs inference session.
     /// </summary>
-    private List<YoloYBResult> Inference(Image<Rgba32> image)
+    private List<YoloYbResult> Inference(Image<Rgba32> image)
     {
         var w = image.Width;
         var h = image.Height;
@@ -191,13 +181,13 @@ public class YoloScorer<T> : IDisposable where T : YoloModel
         var boxes = (result.First(x => x.Name == "boxes").Value as DenseTensor<float>).ToArray();
         var scores = (result.First(x => x.Name == "scores").Value as DenseTensor<float>).ToArray();
         var labels = (result.First(x => x.Name == "labels").Value as DenseTensor<int>).ToArray();
-        List<YoloYBResult> rs = new List<YoloYBResult>();
+        List<YoloYbResult> rs = new List<YoloYbResult>();
         for (int i = 0; i < num_dets; i++)
         {
             var box = new Box(boxes.Skip(i * 4).Take(4).ToArray(), w, h);
             var score = scores.Skip(i * 1).Take(1).ToArray()[0];
             var label = labels.Skip(i * 1).Take(1).ToArray()[0];
-            rs.Add(new YoloYBResult(box, score, label));
+            rs.Add(new YoloYbResult(box, score, label,label.ToString()));
         }
         return rs;
         //  YoloYBResult[] outputs = new YoloYBResult[num_dets[0]];
@@ -348,7 +338,7 @@ public class YoloScorer<T> : IDisposable where T : YoloModel
     /// <summary>
     /// Runs object detection.
     /// </summary>
-    public List<YoloYBResult> Predict(Image<Rgba32> image)
+    public List<YoloYbResult> Predict(Image<Rgba32> image)
     {
         return Inference(image.Clone());
     }
