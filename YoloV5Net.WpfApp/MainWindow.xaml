@@ -18,7 +18,7 @@
             DataType="{x:Type local:TabItemViewModel}">
             <Grid 
                 AllowDrop="True"
-                Drop="FireExtinguisherDropArea_Drop"
+                Drop="DropArea_Drop"
                 Background="LightGray">
                 <Grid
                     Margin="10"

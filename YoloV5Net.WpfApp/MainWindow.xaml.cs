@@ -12,15 +12,16 @@ namespace YoloV5Net.WpfApp
         {
             InitializeComponent();
         }
-        private void FireExtinguisherDropArea_Drop(object sender, DragEventArgs e)
+        private void DropArea_Drop(object sender, DragEventArgs e)
         {
+            var s = sender as FrameworkElement;
+            var vm = s.DataContext as TabItemViewModel;
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
                 string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
                 string filePath = files[0];
-                var viewModel = DataContext as MainViewModel;
-                viewModel.TabItemlViewModel.ImagePath = filePath;
-                viewModel.TabItemlViewModel.Detect(); 
+                vm.ImagePath = filePath;
+                vm.Detect();
             }
         }
     }
