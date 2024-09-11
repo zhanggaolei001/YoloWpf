@@ -28,11 +28,9 @@ public record YoloV5TierDefects() : YoloModel(
 
     new()
     {
-        new(0, "bxs"),//0
-        new(1, "red"),
-        new(2, "green"),
-        new(3, "none"), //3 
-        new(4, "damaged"),
+        new(0, "a1"),//0
+        new(1, "o1"),
+        new(2, "c1"), 
     },
     true
 );
